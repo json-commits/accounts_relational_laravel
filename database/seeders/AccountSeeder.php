@@ -15,7 +15,7 @@ class AccountSeeder extends Seeder
      */
     public function run(): void
     {
-        $accounts = Account::factory(5)->
+        $accounts = Account::factory(20)->
             has(AccountInformation::factory(1))->
             has(Address::factory(1)->default())->
             create();

@@ -23,6 +23,7 @@ class AddressController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    // TODO: Add validation for the request for duplicate address
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         $user_address_object = auth()->user()->address();
@@ -43,6 +44,10 @@ class AddressController extends Controller
     {
         $address = auth()->user()->address()->find($request->id);
 
+        if (!$address) {
+            return $this->errorResponse('Address not found', 404);
+        }
+
         return $this->successResponse($address);
     }
 
@@ -51,15 +56,19 @@ class AddressController extends Controller
      */
     public function update(AddressIDRequest $request): \Illuminate\Http\JsonResponse
     {
-        $address = auth()->user()->address()->find($request->id);
+        $address_object = auth()->user()->address()->find($request->id);
+
+        if (!$address_object) {
+            return $this->errorResponse('Address not found', 404);
+        }
 
         if ($request->default) {
             auth()->user()->address()->where('default', 1)->update(['default' => 0]);
         }
 
-        $address->update($request->all());
+        $address_object->update($request->all());
 
-        return $this->successResponse($address);
+        return $this->successResponse($address_object);
     }
 
     /**
@@ -68,6 +77,10 @@ class AddressController extends Controller
     public function destroy(AddressIDRequest $request): \Illuminate\Http\JsonResponse
     {
         $address = auth()->user()->address()->find($request->id);
+
+        if (!$address) {
+            return $this->errorResponse('Address not found', 404);
+        }
 
         $address->delete();
 
