@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AddressIDRequest;
+use App\Http\Requests\AddressRequest;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponse;
 
@@ -24,9 +25,20 @@ class AddressController extends Controller
      * Store a newly created resource in storage.
      */
     // TODO: Add validation for the request for duplicate address
-    public function store(Request $request): \Illuminate\Http\JsonResponse
+    public function store(AddressRequest $request): \Illuminate\Http\JsonResponse
     {
         $user_address_object = auth()->user()->address();
+
+        if ($user_address_object->count() > 0) {
+            $address = $user_address_object->where('street', $request->street)
+                ->where('city', $request->city)
+                ->where('zip', $request->zip)
+                ->first();
+
+            if ($address) {
+                return $this->errorResponse('Address already exists', 401);
+            }
+        }
 
         if ($request->default) {
             $user_address_object->where('default', 1)->update(['default' => 0]);
@@ -40,7 +52,7 @@ class AddressController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request): \Illuminate\Http\JsonResponse
+    public function show(AddressRequest $request): \Illuminate\Http\JsonResponse
     {
         $address = auth()->user()->address()->find($request->id);
 
