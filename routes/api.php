@@ -9,12 +9,16 @@ Route::get('/user', function (Request $request) {
 
 Route::group(['prefix' => 'v1'], function () {
     Route::post('/login', [App\Http\Controllers\AccountController::class, 'login']);
+    Route::post('/register', [App\Http\Controllers\AccountController::class, 'register']);
 
     Route::middleware(['auth:sanctum'])->group(function () {
+        Route::post('/logout', [App\Http\Controllers\AccountController::class, 'logout']);
 
         Route::group(['prefix' => 'account'], function () {
             Route::post('/info', [App\Http\Controllers\AccountInformationController::class, 'index']);
             Route::post('/update', [App\Http\Controllers\AccountInformationController::class, 'update']);
+            Route::post('/create', [App\Http\Controllers\AccountInformationController::class, 'store']);
+            Route::post('/delete', [App\Http\Controllers\AccountController::class, 'destroy']);
         });
 
         Route::group(['prefix' => 'address'], function () {
